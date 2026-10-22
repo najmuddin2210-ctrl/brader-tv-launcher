@@ -1,3 +1,12 @@
-plugins {
-    id 'com.android.application' version '8.5.2' apply false
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.brader.tv'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.brader.tv'
+        minSdk 23
+        targetSdk 28
+        versionCode 1
+        versionName '0.1.0'
+    }
 }
