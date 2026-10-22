@@ -1,0 +1,4 @@
+LANDSCAPE MANIFEST CHANGE
+In app/src/main/AndroidManifest.xml, inside the existing <activity ...> tag for MainActivity, add:
+    android:screenOrientation="landscape"
+Keep the existing MAIN/LAUNCHER intent-filter and all other attributes. Do not replace the whole manifest blindly.
