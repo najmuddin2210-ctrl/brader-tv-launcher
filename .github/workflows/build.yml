@@ -33,16 +33,45 @@ jobs:
         with:
           gradle-version: "8.7"
 
+      - name: Prepare Android project
+        shell: bash
+        run: |
+          mkdir -p app/src/main/java/com/brader/tv
+          mkdir -p app/src/main/assets
+          mkdir -p app/src/main/res/values
+
+          cp MainActivity.java app/src/main/java/com/brader/tv/
+          cp AndroidManifest.xml app/src/main/
+          cp index.html app/src/main/assets/
+          cp styles.xml app/src/main/res/values/styles.xml
+
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.brader.tv'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.brader.tv'
+                  minSdk 23
+                  targetSdk 28
+                  versionCode 1
+                  versionName '1.0'
+              }
+          }
+          EOF
+
       - name: Install Android SDK packages
         shell: bash
         run: |
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager 2>/dev/null | sort -V | tail -n 1)"
-
           if [ -z "$SDKMANAGER" ]; then
-            echo "ERROR: sdkmanager tidak dijumpai."
+            echo "ERROR: sdkmanager tidak dijumpai"
             exit 1
           fi
-
           "$SDKMANAGER" --install "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build APK
