@@ -36,13 +36,22 @@ jobs:
       - name: Prepare Android project
         shell: bash
         run: |
+          set -euo pipefail
+
           mkdir -p app/src/main/java/com/brader/tv
           mkdir -p app/src/main/assets
           mkdir -p app/src/main/res/values
 
-          cp MainActivity.java app/src/main/java/com/brader/tv/
-          cp AndroidManifest.xml app/src/main/
-          cp index.html app/src/main/assets/
+          test -f MainActivity.java
+          test -f AndroidManifest.xml
+          test -f index.html
+          test -f stadium-wallpaper.png
+          test -f styles.xml
+
+          cp MainActivity.java app/src/main/java/com/brader/tv/MainActivity.java
+          cp AndroidManifest.xml app/src/main/AndroidManifest.xml
+          cp index.html app/src/main/assets/index.html
+          cp stadium-wallpaper.png app/src/main/assets/stadium-wallpaper.png
           cp styles.xml app/src/main/res/values/styles.xml
 
           cat > app/build.gradle <<'EOF'
@@ -58,11 +67,17 @@ jobs:
                   applicationId 'com.brader.tv'
                   minSdk 23
                   targetSdk 28
-                  versionCode 1
-                  versionName '1.0'
+                  versionCode 2
+                  versionName '1.1'
               }
           }
           EOF
+
+          echo "=== Android source files ==="
+          find app/src/main -maxdepth 6 -type f -print | sort
+
+          echo "=== Wallpaper size ==="
+          wc -c app/src/main/assets/stadium-wallpaper.png
 
       - name: Install Android SDK packages
         shell: bash
@@ -76,6 +91,13 @@ jobs:
 
       - name: Build APK
         run: gradle assembleDebug
+
+      - name: Verify APK assets
+        shell: bash
+        run: |
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -f "$APK"
+          unzip -l "$APK" | grep -E 'assets/(index.html|stadium-wallpaper.png)'
 
       - name: Upload APK
         if: success()
